@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Recharge de Solde</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Variables de couleurs */
+        :root {
+            --primary-color: #0080ff;
+            --secondary-color: #4eceff;
+            --background-color: #f0f8ff;
+            --text-color: #ffffff;
+            --accent-color: #00ffff;
+        }
+
+        /* Reset et base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #e6f2ff, #b3d9ff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: auto;
+            padding: 20px;
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Conteneur principal */
+        .container {
+            background: linear-gradient(145deg, #1e90ff, #4169e1);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(30,144,255,0.3), 0 5px 15px rgba(0,0,255,0.2);
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            color: white;
+            position: relative;
+            overflow: visible;
+            animation: slideIn 0.8s ease-out;
+        }
+
+        /* Titre */
+        h2 {
+            color: var(--accent-color);
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+
+        /* Information */
+        .info {
+            background-color: rgba(255,255,255,0.1);
+            border-left: 4px solid var(--accent-color);
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 5px;
+        }
+
+        /* Champs de saisie */
+        input, select {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+
+        input:hover, select:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 10px rgba(0,255,255,0.3);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(0,255,255,0.5);
+            animation: shake 0.5s linear;
+        }
+
+        /* Bouton */
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--accent-color);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                120deg, 
+                transparent, 
+                rgba(255,255,255,0.3), 
+                transparent
+            );
+            transition: all 0.5s;
+        }
+
+        button:hover:before {
+            left: 100%;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* Messages d'erreur */
+        .error {
+            color: #ff4444;
+            font-size: 0.8em;
+            margin-top: -10px;
+            margin-bottom: 15px;
+            text-align: left;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .container {
+                width: 95%;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Recharge de Solde</h2>
+        <div class="info">
+            Montant minimum de dépôt: <strong>3500 FCFA</strong>
+        </div>
+        <form id="rechargeForm" novalidate>
+            <div>
+                <input 
+                    type="number" 
+                    id="amount" 
+                    name="amount" 
+                    placeholder="Montant à recharger" 
+                    min="2000" 
+                    required
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                >
+                <div id="amountError" class="error"></div>
+            </div>
+            
+            <div>
+                <select id="paymentMethod" name="paymentMethod" required>
+                    <option value="">Veuillez choisir un mode de paiement</option>
+                    <option value="mtn">MTN</option>
+                    <option value="moov">Moov</option>
+                    <option value="orange">Orange</option>
+                    <option value="wave">WAVE</option>
+                    <option value="usd">USDT</option>
+                </select>
+                <div id="paymentMethodError" class="error"></div>
+            </div>
+            
+            <button type="submit">Valider</button>
+        </form>
+        <div class="footer">
+            Pour toute assistance, contactez notre service client.
+        </div>
+    </div>
+
+    <script>
+        // Script précédent conservé (non modifié)
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('rechargeForm');
+            const amountInput = document.getElementById('amount');
+            const paymentMethodSelect = document.getElementById('paymentMethod');
+            const amountError = document.getElementById('amountError');
+            const paymentMethodError = document.getElementById('paymentMethodError');
+
+            const paymentDetails = {
+                mtn: ' bientôt disponible',
+                moov: 'bientôt disponible',
+                orange: 'bientôt disponible',
+                wave: 'bientôt disponible',
+                usd: 'bientôt disponible '
+            };
+
+            function validateAmount() {
+                const amount = amountInput.value.trim();
+                if (!amount) {
+                    amountError.textContent = 'Veuillez saisir un montant';
+                    return false;
+                }
+                if (parseFloat(amount) < 2500) {
+                    amountError.textContent = 'Le montant minimum est de 2500 FCFA';
+                    return false;
+                }
+                amountError.textContent = '';
+                return true;
+            }
+
+            function validatePaymentMethod() {
+                const paymentMethod = paymentMethodSelect.value;
+                if (!paymentMethod) {
+                    paymentMethodError.textContent = 'Veuillez choisir un mode de paiement';
+                    return false;
+                }
+                paymentMethodError.textContent = '';
+                return true;
+            }
+
+            amountInput.addEventListener('input', validateAmount);
+            paymentMethodSelect.addEventListener('change', validatePaymentMethod);
+
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const isAmountValid = validateAmount();
+                const isPaymentMethodValid = validatePaymentMethod();
+
+                if (isAmountValid && isPaymentMethodValid) {
+                    const paymentMethod = paymentMethodSelect.value;
+                    const amount = amountInput.value;
+                    const selectedNumber = paymentDetails[paymentMethod];
+
+                    if (selectedNumber) {
+                        window.location.href = `confirmation.html?amount=${amount}&paymentMethod=${paymentMethod}&number=${encodeURIComponent(selectedNumber)}`;
+                    } else {
+                        paymentMethodError.textContent = 'Mode de paiement non disponible';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

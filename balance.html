@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Mon compte BNP Paribas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bnp-green: #00915a;
+            --bnp-dark: #00593d;
+            --bnp-orange: #ff6600;
+            --bnp-light: #f7f7f7;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --gradient-primary: linear-gradient(135deg, var(--bnp-green), var(--bnp-dark));
+            --border-radius-lg: 20px;
+            --box-shadow-default: 0 8px 20px rgba(0, 0, 0, 0.1);
+            --transition-default: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body {
+            background: var(--bnp-light);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px 20px 80px;
+            position: relative;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            padding: 24px;
+            box-shadow: var(--box-shadow-default);
+            margin-bottom: 20px;
+            transition: var(--transition-default);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .profile-card {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .profile-icon {
+            background: rgba(255, 255, 255, 0.2);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .profile-info h2 {
+            font-size: 18px;
+            margin-bottom: 6px;
+        }
+
+        .profile-info p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .balance-card {
+            text-align: center;
+            padding: 35px 24px;
+            position: relative;
+        }
+
+        .toggle-balance {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            background: none;
+            border: none;
+            color: var(--bnp-green);
+            cursor: pointer;
+            font-size: 20px;
+            padding: 8px;
+            border-radius: 50%;
+            transition: var(--transition-default);
+        }
+
+        .toggle-balance:hover {
+            background: var(--bnp-light);
+        }
+
+        .balance-label {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .balance-amount {
+            font-size: 42px;
+            font-weight: bold;
+            color: var(--bnp-green);
+        }
+
+        .balance-hidden {
+            display: none;
+        }
+
+        .telegram-card {
+            background: var(--bnp-orange);
+        }
+
+        .telegram-card a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            font-size: 16px;
+            padding: 10px;
+        }
+
+        .bank-card {
+            height: 200px;
+            background: var(--gradient-primary);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bank-card::after {
+            content: '';
+            position: absolute;
+            right: -50px;
+            bottom: -50px;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 98;
+        }
+
+        .popup-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .popup-menu {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border-radius: var(--border-radius-lg);
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            display: none;
+            width: 90%;
+            max-width: 400px;
+            z-index: 99;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .popup-menu.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .popup-menu-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .popup-button {
+            background: var(--bnp-light);
+            border: none;
+            padding: 15px;
+            border-radius: 15px;
+            color: var(--text-primary);
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition-default);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .popup-button i {
+            font-size: 20px;
+            color: var(--bnp-green);
+            transition: var(--transition-default);
+        }
+
+        .popup-button:hover {
+            background: var(--bnp-green);
+            color: white;
+        }
+
+        .popup-button:hover i {
+            color: white;
+        }
+
+        .guide-button {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: var(--transition-default);
+            width: 100%;
+        }
+
+        .guide-button i {
+            font-size: 20px;
+            color: white;
+        }
+
+        .guide-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 145, 90, 0.3);
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.08);
+            border-top-left-radius: 25px;
+            border-top-right-radius: 25px;
+            z-index: 100;
+        }
+
+        .footer-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 12px;
+            gap: 5px;
+            transition: var(--transition-default);
+        }
+
+        .footer-button i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .footer-button:hover {
+            color: var(--bnp-green);
+        }
+
+        .center-button {
+            background: var(--gradient-primary);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0, 145, 90, 0.4);
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            position: relative;
+            z-index: 101;
+        }
+
+        .center-button i {
+            transition: transform 0.3s ease;
+        }
+
+        .center-button.active i {
+            transform: rotate(45deg);
+        }
+
+        .center-button:hover {
+            transform: scale(1.1);
+        }
+
+        .center-button.active {
+            background: var(--bnp-orange);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card profile-card">
+            <div class="profile-icon">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="profile-info">
+                <h2>BIENVENUE SUR ELOGIX</h2>
+                <p id="email">Chargement de l'email...</p>
+            </div>
+        </div>
+
+        <div class="card balance-card">
+            <button class="toggle-balance" id="toggleBalance">
+                <i class="fas fa-eye"></i>
+            </button>
+            <div class="balance-label">SOLDE DISPONIBLE</div>
+            <div class="balance-amount" id="balance">Chargement...</div>
+            <div class="balance-amount balance-hidden" id="balanceHidden">****** FCFA</div>
+        </div>
+
+        <div class="card telegram-card">
+            <a href="https://t.me/+dZaqe52kXHBjMDQ8">
+                <i class="fab fa-telegram-plane"></i>
+                <span>Rejoignez notre groupe Telegram</span>
+            </a>
+        </div>
+
+        <div class="card bank-card">
+            <div>
+                <i class="fas fa-credit-card" style="font-size: 30px; margin-bottom: 15px;"></i>
+                <h3>INFORMATIONS</h3>
+            </div>
+            <div style="font-size: 20px; letter-spacing: 4px;">Gagner 10 % chaque jour sur votre Montant déposé au Labo</div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="popup-overlay"></div>
+
+    <div class="popup-menu" id="popup-section">
+        <div class="popup-menu-grid">
+            <a href="recharge.html">
+                <button class="popup-button">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Recharge</span>
+                </button>
+            </a>
+            <a href="retrait.html">
+                <button class="popup-button">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>Retrait</span>
+                </button>
+            </a>
+            <a href="lier_portefeuille.html">
+                <button class="popup-button">
+                    <i class="fas fa-wallet"></i>
+                    <span>Compte</span>
+                </button>
+            </a>
+            <a href="historique.html">
+                <button class="popup-button">
+                    <i class="fas fa-history"></i>
+                    <span>Historique</span>
+                </button>
+            </a>
+            <a href="guide.html">
+                <button class="guide-button">
+                    <i class="fas fa-book"></i>
+                    <span>Guide</span>
+                </button>
+            </a>
+            <a href="star.html">
+                <button class="popup-button">
+                    <i class="fas fa-star"></i>
+                    <span>Labo</span>
+                </button>
+            </a>
+        </div>
+    </div>
+
+    <div class="footer">
+        <a href="index.html" class="footer-button">
+            <i class="fas fa-home"></i>
+            <span>Accueil</span>
+        </a>
+        <a href="historique_retrait.html" class="footer-button">
+            <i class="fas fa-clock"></i>
+            <span>Historique</span>
+        </a>
+        <button class="center-button" id="center-button">
+            <i class="fas fa-plus"></i>
+        </button>
+        <a href="carte.html" class="footer-button">
+            <i class="fas fa-credit-card"></i>
+            <span>Carte</span>
+        </a>
+        <a href="equipe.html" class="footer-button">
+            <i class="fas fa-users"></i>
+            <span>Équipe</span>
+        </a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+        import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCPQvlxIjvJPkMZQ4qElkHla_xQ5QiZfFs",
+            authDomain: "paris-3df9f.firebaseapp.com",
+            databaseURL: "https://paris-3df9f-default-rtdb.firebaseio.com",
+            projectId: "paris-3df9f",
+            storageBucket: "paris-3df9f.appspot.com",
+            messagingSenderId: "365107415196",
+            appId: "1:365107415196:web:4c0021baec5a51a0f50559"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+
+        async function initializeUserAccount(user) {
+            const userRef = ref(database, 'users/' + user.uid);
+            const snapshot = await get(userRef);
+            if (!snapshot.exists()) {
+                await set(userRef, {
+                    email: user.email,
+                    balance: 200,
+                    createdAt: new Date().toISOString()
+                });
+                console.log("Nouveau compte créé avec 200F");
+            }
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                document.getElementById("email").innerText = user.email;
+                await initializeUserAccount(user);
+                const userRef = ref(database, 'users/' + user.uid);
+                onValue(userRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        const userData = snapshot.val();
+                        document.getElementById("balance").innerText = `${userData.balance} FCFA`;
+                    }
+                });
+            } else {
+                document.getElementById("balance").innerText = "Veuillez vous connecter";
+                document.getElementById("email").innerText = "Non connecté";
+            }
+        });
+
+        window.createAccount = async function(email, password) {
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                console.error("Erreur lors de la création du compte:", error);
+                throw error;
+            }
+        }
+    </script>
+
+    <script>
+        // Gestionnaire pour le popup
+        const centerButton = document.getElementById('center-button');
+        const popup = document.getElementById('popup-section');
+        const overlay = document.getElementById('popup-overlay');
+        let isOpen = false;
+
+        function togglePopup() {
+            isOpen = !isOpen;
+            
+            if (isOpen) {
+                popup.style.display = 'block';
+                overlay.style.display = 'block';
+                setTimeout(() => {
+                    popup.classList.add('active');
+                    overlay.classList.add('active');
+                    centerButton.classList.add('active');
+                }, 10);
+            } else {
+                popup.classList.remove('active');
+                overlay.classList.remove('active');
+                centerButton.classList.remove('active');
+                setTimeout(() => {
+                    popup.style.display = 'none';
+                    overlay.style.display = 'none';
+                }, 300);
+            }
+        }
+
+        centerButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            togglePopup();
+        });
+
+        overlay.addEventListener('click', () => {
+            if (isOpen) {
+                togglePopup();
+            }
+        });
+
+        popup.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        // Gestionnaire pour afficher/masquer le solde
+        const toggleBalanceBtn = document.getElementById('toggleBalance');
+        const balanceElement = document.getElementById('balance');
+        const balanceHiddenElement = document.getElementById('balanceHidden');
+        let isBalanceVisible = true;
+
+        toggleBalanceBtn.addEventListener('click', () => {
+            isBalanceVisible = !isBalanceVisible;
+            
+            if (isBalanceVisible) {
+                balanceElement.style.display = 'block';
+                balanceHiddenElement.style.display = 'none';
+                toggleBalanceBtn.innerHTML = '<i class="fas fa-eye"></i>';
+            } else {
+                balanceElement.style.display = 'none';
+                balanceHiddenElement.style.display = 'block';
+                toggleBalanceBtn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            }
+        });
+    </script>
+</body>
+</html>

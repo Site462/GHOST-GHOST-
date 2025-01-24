@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retrait | MonService</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #000000 0%, #0d5700 100%);
+            color: #000000;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 1.8rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .info-card h3 {
+            color: #ff1f00;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 1.3rem;
+        }
+
+        .balance-display {
+            background: linear-gradient(135deg,  0%, #0083B0 100%);
+            color: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 15px 35px rgba(0, 180, 219, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .balance-display p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .amount {
+            font-size: 3rem;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .fees-info {
+            background: linear-gradient(135deg,  0%, #0396FF 100%);
+            color: white;
+            padding: 1.2rem;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 8px 20px rgba(3, 150, 255, 0.2);
+        }
+
+        .limits-info {
+            background: linear-gradient(135deg,  0%, #F6416C 100%);
+            color: white;
+            padding: 1.2rem;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 8px 20px rgba(246, 65, 108, 0.2);
+        }
+
+        .form-group {
+            margin-bottom: 1.8rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.8rem;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #6B73FF;
+            box-shadow: 0 0 0 3px rgba(107, 115, 255, 0.2);
+            background: white;
+        }
+
+        #withdrawal-summary {
+            background: linear-gradient(135deg, #E2E8F0 0%, #CBD5E0 100%);
+            padding: 1.8rem;
+            border-radius: 15px;
+            margin: 1.8rem 0;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        #withdrawal-summary p {
+            margin: 0.8rem 0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(107, 115, 255, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(107, 115, 255, 0.4);
+        }
+
+        button:disabled {
+            background: linear-gradient(135deg, #CBD5E0 0%, #A0AEC0 100%);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .history-link {
+            text-align: center;
+            margin-top: 2.5rem;
+        }
+
+        .history-link a {
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .history-link a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .error {
+            color: white;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, #FF9A9E 0%, #FF4B6B 100%);
+            border-radius: 12px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            box-shadow: 0 8px 20px rgba(255, 75, 107, 0.2);
+        }
+
+        .success {
+            color: white;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, #84FAB0 0%, #32CD32 100%);
+            border-radius: 12px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            box-shadow: 0 8px 20px rgba(50, 205, 50, 0.2);
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                margin: 1rem auto;
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .amount {
+                font-size: 2.5rem;
+            }
+
+            .balance-display {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Le reste du HTML reste le même -->
+    <div class="container">
+        <h1>RETRAIT</h1>
+        
+        <div id="withdrawal-info" class="info-card">
+            <!-- Sera rempli par JavaScript -->
+        </div>
+
+        <div class="balance-display">
+            <p>SOLDE DISPONIBLE</p>
+            <div class="amount" id="current-balance">0 FCFA</div>
+        </div>
+
+        <div id="withdrawal-form">
+            <div class="fees-info">
+                <i class="fas fa-info-circle"></i>
+                <span>Des frais de retrait de 10% seront appliqués à votre transaction</span>
+            </div>
+
+            <div class="limits-info">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>Limites de retrait : Minimum 1 000 FCFA - Maximum 1 000 000 FCFA</span>
+            </div>
+
+            <div class="form-group">
+                <label for="amount">Montant à retirer:</label>
+                <input type="number" id="amount" min="1000" max="1000000" required placeholder="Entrez le montant">
+            </div>
+
+            <div id="withdrawal-summary">
+                <p>Montant demandé: <span id="requested-amount">0 FCFA</span></p>
+                <p>Frais (10%): <span id="fees-amount">0 FCFA</span></p>
+                <p><strong>Montant total à débiter: <span id="total-amount">0 FCFA</span></strong></p>
+            </div>
+
+            <div class="form-group">
+                <label for="withdrawalCode">Code de retrait:</label>
+                <input type="password" id="withdrawalCode" required placeholder="Entrez votre code de retrait">
+            </div>
+
+            <button id="withdrawal-button" disabled>
+                <i class="fas fa-money-bill-wave"></i>
+                Effectuer le retrait
+            </button>
+        </div>
+
+        <div id="message"></div>
+
+        <div class="history-link">
+            <a href="historique_retrait.html">
+                <i class="fas fa-history"></i>
+                Voir l'historique des retraits
+            </a>
+        </div>
+    </div>
+    
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getDatabase, ref, set, get, onValue, runTransaction, push } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCPQvlxIjvJPkMZQ4qElkHla_xQ5QiZfFs",
+        authDomain: "paris-3df9f.firebaseapp.com",
+        databaseURL: "https://paris-3df9f-default-rtdb.firebaseio.com",
+        projectId: "paris-3df9f",
+        storageBucket: "paris-3df9f.appspot.com",
+        messagingSenderId: "365107415196",
+        appId: "1:365107415196:web:4c0021baec5a51a0f50559"
+    };  
+
+// Initialisation Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase();
+const auth = getAuth();
+
+// Constantes pour les limites de retrait
+const MIN_WITHDRAWAL = 1000;
+const MAX_WITHDRAWAL = 1000000;
+
+// Fonction pour formater les montants
+function formatAmount(amount) {
+    return amount.toLocaleString('fr-FR') + ' FCFA';
+}
+
+// Fonction pour mettre à jour le résumé du retrait
+function updateWithdrawalSummary() {
+    const amount = parseFloat(document.getElementById('amount').value) || 0;
+    const fees = amount * 0.10; // 10% de frais
+    const total = amount - fees; // Montant après déduction des frais
+
+    // Affichage du résumé
+    document.getElementById('withdrawal-summary').style.display = 'block';
+    document.getElementById('requested-amount').textContent = formatAmount(amount);
+    document.getElementById('fees-amount').textContent = formatAmount(fees);
+    document.getElementById('total-amount').textContent = formatAmount(total);
+
+    const messageDiv = document.getElementById('message');
+    const withdrawalButton = document.getElementById('withdrawal-button');
+    const balance = parseFloat(document.getElementById('current-balance').textContent.replace(/[^\d.-]/g, ''));
+
+    // Réinitialiser le message
+    messageDiv.innerHTML = '';
+
+    // Vérification des limites
+    if (amount < MIN_WITHDRAWAL) {
+        messageDiv.innerHTML = `<p class="error"><i class="fas fa-exclamation-circle"></i> Le montant minimum de retrait est de ${formatAmount(MIN_WITHDRAWAL)}</p>`;
+        withdrawalButton.disabled = true;
+    } else if (amount > MAX_WITHDRAWAL) {
+        messageDiv.innerHTML = `<p class="error"><i class="fas fa-exclamation-circle"></i> Le montant maximum de retrait est de ${formatAmount(MAX_WITHDRAWAL)}</p>`;
+        withdrawalButton.disabled = true;
+    } else if (total > balance) {
+        messageDiv.innerHTML = '<p class="error"><i class="fas fa-exclamation-circle"></i> Solde insuffisant pour effectuer ce retrait</p>';
+        withdrawalButton.disabled = true;
+    } else if (amount <= 0) {
+        withdrawalButton.disabled = true;
+    } else {
+        withdrawalButton.disabled = false;
+    }
+}
+
+// Fonction pour vérifier la configuration du retrait
+async function checkWithdrawalConfig() {
+    const user = auth.currentUser;
+    if (!user) return null;
+
+    const configRef = ref(db, `users/${user.uid}/withdrawalConfig`);
+    const snapshot = await get(configRef);
+
+    if (snapshot.exists()) {
+        return snapshot.val();
+    } else {
+        return null; // Pas de configuration trouvée
+    }
+}
+
+// Fonction pour mettre à jour le solde dans l'interface utilisateur
+async function updateBalance(userId) {
+    const balanceRef = ref(db, `users/${userId}/balance`);
+    const balanceSnapshot = await get(balanceRef);
+    const currentBalance = balanceSnapshot.val() || 0;
+
+    // Mise à jour de l'élément d'affichage du solde
+    document.getElementById('current-balance').textContent = formatAmount(currentBalance);
+}
+
+// Fonction pour effectuer un retrait
+async function makeWithdrawal() {
+    const amount = parseFloat(document.getElementById('amount').value);
+    const withdrawalCode = document.getElementById('withdrawalCode').value;
+    const messageDiv = document.getElementById('message');
+    const fees = amount * 0.10; // 10% de frais
+    const totalAmount = amount - fees; // Montant après déduction des frais
+
+    if (!amount || !withdrawalCode) {
+        messageDiv.innerHTML = '<p class="error"><i class="fas fa-exclamation-circle"></i> Veuillez remplir tous les champs</p>';
+        return;
+    }
+
+    // Vérification des limites de retrait
+    if (amount < MIN_WITHDRAWAL) {
+        messageDiv.innerHTML = `<p class="error"><i class="fas fa-exclamation-circle"></i> Le montant minimum de retrait est de ${formatAmount(MIN_WITHDRAWAL)}</p>`;
+        return;
+    }
+
+    if (amount > MAX_WITHDRAWAL) {
+        messageDiv.innerHTML = `<p class="error"><i class="fas fa-exclamation-circle"></i> Le montant maximum de retrait est de ${formatAmount(MAX_WITHDRAWAL)}</p>`;
+        return;
+    }
+
+    try {
+        const user = auth.currentUser;
+        if (!user) {
+            messageDiv.innerHTML = '<p class="error"><i class="fas fa-exclamation-circle"></i> Vous devez être connecté</p>';
+            return;
+        }
+
+        const config = await checkWithdrawalConfig();
+        if (!config) {
+            messageDiv.innerHTML = '<p class="error"><i class="fas fa-exclamation-circle"></i> Veuillez d\'abord configurer vos informations de retrait</p>';
+            return;
+        }
+
+        if (withdrawalCode !== config.code) {
+            messageDiv.innerHTML = '<p class="error"><i class="fas fa-exclamation-circle"></i> Code de retrait incorrect</p>';
+            return;
+        }
+
+        // Vérification et mise à jour du solde
+        const balanceRef = ref(db, `users/${user.uid}/balance`);
+        let success = false;
+
+        await runTransaction(balanceRef, (currentBalance) => {
+            if (currentBalance === null || currentBalance < amount) {
+                success = false;
+                return currentBalance;
+            }
+            success = true;
+            return currentBalance - amount; // Déduire le montant total
+        });
+
+        if (!success) {
+            messageDiv.innerHTML = '<p class="error"><i class="fas fa-exclamation-circle"></i> Solde insuffisant pour effectuer ce retrait</p>';
+            return;
+        }
+
+        // Créer la demande de retrait
+        const withdrawalRef = ref(db, `users/${user.uid}/withdrawals`);
+        await push(withdrawalRef, {
+            amount: Number(amount),
+            fees: fees,
+            totalAmount: totalAmount,
+            status: 'en attente',
+            timestamp: Date.now(),
+            phone: config.phone,
+            operator: config.operator
+        });
+
+        // Mise à jour du solde
+        await updateBalance(user.uid);
+
+        messageDiv.innerHTML = '<p class="success"><i class="fas fa-check-circle"></i> Demande de retrait envoyée avec succès!</p>';
+        setTimeout(() => {
+            window.location.href = 'historique_retrait.html';
+        }, 2000);
+    } catch (error) {
+        messageDiv.innerHTML = `<p class="error"><i class="fas fa-exclamation-circle"></i> Erreur: ${error.message}</p>`;
+    }
+}
+
+// Initialisation et gestion des événements
+document.addEventListener('DOMContentLoaded', () => {
+    // Ajouter les événements
+    document.getElementById('amount').addEventListener('input', updateWithdrawalSummary);
+    document.getElementById('withdrawal-button').addEventListener('click', makeWithdrawal);
+
+    // Vérification de l'authentification de l'utilisateur
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        // Charger et afficher le solde
+        await updateBalance(user.uid);
+
+        const config = await checkWithdrawalConfig();
+        const infoDiv = document.getElementById('withdrawal-info');
+
+        if (config) {
+            infoDiv.innerHTML = `
+                <h3><i class="fas fa-info-circle"></i> Informations de retrait</h3>
+                <p><i class="fas fa-phone"></i> Numéro: ${config.phone}</p>
+                <p><i class="fas fa-building"></i> Opérateur: ${config.operator}</p>
+            `;
+        } else {
+            infoDiv.innerHTML = `
+                <p class="error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Veuillez d'abord <a href="lier_portefeuille.html">configurer vos informations de retrait</a>
+                </p>
+            `;
+            document.getElementById('withdrawal-form').style.display = 'none';
+        }
+    });
+});
+</script>
+</body>
+</html>

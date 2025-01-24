@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historique des retraits | MonService</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+
+        :root {
+            --primary-color: #3182ce;
+            --secondary-color: #4299e1;
+            --text-color: #1a202c;
+            --background-color: #f0f4f8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Animation de cercles en arrière-plan */
+        .background-circles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(49, 130, 206, 0.1);
+            animation: float-and-scale 20s infinite alternate;
+            opacity: 0.6;
+        }
+
+        @keyframes float-and-scale {
+            0% { 
+                transform: translateY(0) scale(1); 
+            }
+            100% { 
+                transform: translateY(-50px) scale(1.2); 
+            }
+        }
+
+        .container {
+            max-width: 600px; /* Réduction de la largeur maximale */
+            margin: 1rem auto;
+            padding: 0 1rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-color);
+            margin: 1rem 0;
+            font-size: 2rem; /* Réduction de la taille du titre */
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            animation: gradient-shift 5s ease infinite;
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .history-card {
+            background: white;
+            border-radius: 12px; /* Réduction du rayon des coins */
+            padding: 1rem; /* Réduction du padding */
+            margin-bottom: 1rem; /* Réduction de la marge entre les cartes */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08); /* Ombre plus légère */
+            transition: transform 0.3s ease;
+        }
+
+        .history-card:hover {
+            transform: scale(1.02);
+        }
+
+        .amount {
+            font-size: 1.5rem; /* Réduction de la taille de police */
+            font-weight: 800;
+            color: var(--text-color);
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+
+        .amount i {
+            color: var(--primary-color);
+            font-size: 1.3rem;
+        }
+
+        .info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem; /* Réduction de l'espacement */
+            margin-bottom: 0.8rem;
+        }
+
+        .details {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #4a5568;
+            font-size: 0.9rem; /* Réduction de la taille de police */
+            opacity: 0.8;
+        }
+
+        .details i {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.8rem; /* Réduction du padding */
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 0.9rem; /* Réduction de la taille de police */
+            margin-top: 0.8rem;
+        }
+
+        .status.pending {
+            background: #000000;
+            color: #46fe15;
+        }
+
+        .status.approved {
+            background: #5bff15;
+            color: #000000;
+        }
+
+        .status.rejected {
+            background: #ff1f00;
+            color: #000000;
+        }
+
+        .empty-history {
+            text-align: center;
+            color: var(--primary-color);
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .empty-history i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--secondary-color);
+        }
+
+        @media (max-width: 640px) {
+            .info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Cercles animés en arrière-plan -->
+    <div class="background-circles" id="background-circles"></div>
+
+    <div class="container">
+        <h1>Historique des retraits</h1>
+        <div id="history-list">
+            <!-- Sera rempli par JavaScript -->
+        </div>
+    </div>
+
+    <script type="module">
+        // Génération des cercles animés
+        function createBackgroundCircles() {
+            const container = document.getElementById('background-circles');
+            const colors = ['#3182ce', '#4299e1', '#63b3ed', '#90cdf4'];
+            
+            for (let i = 0; i < 10; i++) {
+                const circle = document.createElement('div');
+                circle.classList.add('circle');
+                
+                // Tailles et positions aléatoires
+                const size = Math.random() * 200 + 50;
+                circle.style.width = `${size}px`;
+                circle.style.height = `${size}px`;
+                circle.style.top = `${Math.random() * 100}%`;
+                circle.style.left = `${Math.random() * 100}%`;
+                
+                // Couleur aléatoire
+                circle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                circle.style.opacity = Math.random() * 0.3 + 0.1;
+                
+                // Animation personnalisée
+                circle.style.animationDuration = `${Math.random() * 20 + 10}s`;
+                circle.style.animationDelay = `${Math.random() * 5}s`;
+                
+                container.appendChild(circle);
+            }
+        }
+
+        // Initialisation des cercles
+        createBackgroundCircles();
+
+        // Firebase Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCPQvlxIjvJPkMZQ4qElkHla_xQ5QiZfFs",
+            authDomain: "paris-3df9f.firebaseapp.com",
+            databaseURL: "https://paris-3df9f-default-rtdb.firebaseio.com",
+            projectId: "paris-3df9f",
+            storageBucket: "paris-3df9f.appid.com",
+            messagingSenderId: "365107415196",
+            appId: "1:365107415196:web:4c0021baec5a51a0f50559"
+        };  
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase();
+        const auth = getAuth();
+
+        function formatAmount(amount) {
+            return amount.toLocaleString('fr-FR') + ' FCFA';
+        }
+
+        function formatDate(timestamp) {
+            return new Date(timestamp).toLocaleString('fr-FR', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function getStatusClass(status) {
+            switch(status.toLowerCase()) {
+                case 'approuvé':
+                case 'approved':
+                    return 'approved';
+                case 'rejeté':
+                case 'rejected':
+                    return 'rejected';
+                default:
+                    return 'pending';
+            }
+        }
+
+        function createWithdrawalCard(withdrawal, id, isAdmin = false) {
+            const card = document.createElement('div');
+            card.className = 'history-card';
+            
+            card.innerHTML = `
+                <div class="amount">
+                    <i class="fas fa-money-bill-wave"></i>
+                    ${formatAmount(withdrawal.amount)}
+                </div>
+                <div class="info">
+                    <div class="details">
+                        <i class="fas fa-calendar"></i>
+                        ${formatDate(withdrawal.timestamp)}
+                    </div>
+                    <div class="details">
+                        <i class="fas fa-phone"></i>
+                        ${withdrawal.phone}
+                    </div>
+                </div>
+                <div class="status ${getStatusClass(withdrawal.status)}">
+                    ${withdrawal.status}
+                </div>
+            `;
+            
+            return card;
+        }
+
+        async function updateWithdrawalStatus(userId, withdrawalId, status) {
+            const withdrawalRef = ref(db, `users/${userId}/withdrawals/${withdrawalId}`);
+            await update(withdrawalRef, { status: status });
+        }
+
+        // Rendre les fonctions disponibles globalement pour les boutons
+        window.approveWithdrawal = async (withdrawalId) => {
+            const userId = auth.currentUser.uid;
+            await updateWithdrawalStatus(userId, withdrawalId, 'approuvé');
+        };
+
+        window.rejectWithdrawal = async (withdrawalId) => {
+            const userId = auth.currentUser.uid;
+            await updateWithdrawalStatus(userId, withdrawalId, 'rejeté');
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const withdrawalsRef = ref(db, `users/${user.uid}/withdrawals`);
+            
+            onValue(withdrawalsRef, (snapshot) => {
+                const historyList = document.getElementById('history-list');
+                historyList.innerHTML = '';
+
+                if (!snapshot.exists()) {
+                    historyList.innerHTML = `
+                        <div class="empty-history">
+                            <i class="fas fa-history"></i>
+                            <p>Aucun retrait effectué pour le moment</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Convertir en tableau et trier par date décroissante
+                const withdrawals = [];
+                snapshot.forEach((childSnapshot) => {
+                    withdrawals.push({
+                        id: childSnapshot.key,
+                        ...childSnapshot.val()
+                    });
+                });
+
+                withdrawals.sort((a, b) => b.timestamp - a.timestamp);
+
+                withdrawals.forEach((withdrawal) => {
+                    // Vérifier si l'utilisateur est admin (à adapter selon votre logique)
+                    const isAdmin = user.email === 'admin@example.com'; // Exemple
+                    historyList.appendChild(createWithdrawalCard(withdrawal, withdrawal.id, isAdmin));
+                });
+            });
+        });
+    </script>
+</body>
+</html>
