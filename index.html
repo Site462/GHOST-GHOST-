@@ -440,6 +440,32 @@
             return code;
         }
 
+        // Fonction d'extraction du code de parrainage
+        function extractReferralCode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const referralCode = urlParams.get('referral');
+            
+            if (referralCode) {
+                // Sélectionner le champ de code de parrainage
+                const referralInput = document.getElementById('referralCode');
+                
+                // Remplir automatiquement le champ
+                if (referralInput) {
+                    referralInput.value = referralCode;
+                    
+                    // Optionnel : ajouter un message de confirmation
+                    const signupSuccess = document.getElementById('signupSuccess');
+                    if (signupSuccess) {
+                        signupSuccess.textContent = `Code de parrainage ${referralCode} appliqué !`;
+                        signupSuccess.style.color = 'green';
+                    }
+
+                    // Basculer automatiquement vers l'onglet d'inscription
+                    switchTab('signup');
+                }
+            }
+        }
+
         // Fonction de mise à jour du total d'équipe
         async function updateTeamTotal(referralCode) {
             const userRef = ref(database, 'users');
@@ -534,6 +560,10 @@
         window.updateTeamTotal = updateTeamTotal;
         window.attemptLogin = attemptLogin;
         window.attemptSignup = attemptSignup;
+        window.extractReferralCode = extractReferralCode;
+
+        // Appeler la fonction d'extraction du code de parrainage au chargement de la page
+        window.addEventListener('load', extractReferralCode);
     </script>
 </body>
 </html>
