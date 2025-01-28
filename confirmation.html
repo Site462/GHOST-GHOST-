@@ -419,135 +419,167 @@
     <div id="notification" class="notification"></div>
     
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-        import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+        // Import des modules Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { 
+    getAuth, 
+    onAuthStateChanged, 
+    createUserWithEmailAndPassword 
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { 
+    getDatabase, 
+    ref, 
+    set, 
+    get, 
+    onValue, 
+    push 
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCPQvlxIjvJPkMZQ4qElkHla_xQ5QiZfFs",
-            authDomain: "paris-3df9f.firebaseapp.com",
-            databaseURL: "https://paris-3df9f-default-rtdb.firebaseio.com",
-            projectId: "paris-3df9f",
-            storageBucket: "paris-3df9f.appspot.com",
-            messagingSenderId: "365107415196",
-            appId: "1:365107415196:web:4c0021baec5a51a0f50559"
+// Configuration Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyCPQvlxIjvJPkMZQ4qElkHla_xQ5QiZfFs",
+    authDomain: "paris-3df9f.firebaseapp.com",
+    databaseURL: "https://paris-3df9f-default-rtdb.firebaseio.com",
+    projectId: "paris-3df9f",
+    storageBucket: "paris-3df9f.appspot.com",
+    messagingSenderId: "365107415196",
+    appId: "1:365107415196:web:4c0021baec5a51a0f50559"
+};
+
+// Initialisation des services Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+// Fonctions utilitaires
+const UI = {
+    showLoading() {
+        document.querySelector('.loading').style.display = 'flex';
+    },
+
+    hideLoading() {
+        document.querySelector('.loading').style.display = 'none';
+    },
+
+    showNotification(message, type = 'success') {
+        const notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.className = `notification ${type}`;
+        notification.style.display = 'block';
+
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 5000);
+    }
+};
+
+// Gestionnaire du presse-papier
+const ClipboardManager = {
+    copy(elementId) {
+        const text = document.getElementById(elementId).textContent;
+        navigator.clipboard.writeText(text)
+            .then(() => UI.showNotification('Numéro copié avec succès !', 'success'))
+            .catch(err => {
+                console.error('Erreur lors de la copie :', err);
+                UI.showNotification('Erreur lors de la copie', 'error');
+            });
+    }
+};
+
+// Gestionnaire de données
+const DataManager = {
+    loadRechargeData() {
+        const rechargeData = JSON.parse(sessionStorage.getItem('rechargeData'));
+        if (rechargeData) {
+            document.getElementById('paymentNumber').textContent = rechargeData.operatorNumber;
+            document.getElementById('amount').textContent = rechargeData.amount;
+            document.getElementById('phone').textContent = rechargeData.phone;
+            document.getElementById('operator').textContent = rechargeData.operator.toUpperCase();
+        } else {
+            window.location.href = 'recharge.html';
+        }
+    },
+
+    async saveTransaction(user, formData, rechargeData) {
+        const transactionData = {
+            ...rechargeData,
+            userPaymentNumber: formData.userPaymentNumber,
+            transactionId: formData.transactionId,
+            status: 'pending',
+            date: new Date().toISOString(),
+            userId: user.uid,
+            credited: false
         };
 
-        // Initialiser Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getDatabase(app);
+        const transactionsRef = ref(db, 'transactions');
+        const newTransactionRef = push(transactionsRef);
+        await set(newTransactionRef, transactionData);
+    }
+};
 
-        // Fonction pour afficher le loader
-        function showLoading() {
-            document.querySelector('.loading').style.display = 'flex';
-        }
-
-        function hideLoading() {
-            document.querySelector('.loading').style.display = 'none';
-        }
-
-        // Fonction pour afficher les notifications
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = `notification ${type}`;
-            notification.style.display = 'block';
-
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 5000);
-        }
-
-        // Fonction pour copier dans le presse-papier
-        window.copyToClipboard = function(elementId) {
-            const text = document.getElementById(elementId).textContent;
-            navigator.clipboard.writeText(text)
-                .then(() => {
-                    showNotification('Numéro copié avec succès !', 'success');
-                })
-                .catch(err => {
-                    console.error('Erreur lors de la copie :', err);
-                    showNotification('Erreur lors de la copie', 'error');
-                });
-        }
-
-        // Charger les données depuis sessionStorage
-        window.addEventListener('load', function() {
-            const rechargeData = JSON.parse(sessionStorage.getItem('rechargeData'));
-            if (rechargeData) {
-                document.getElementById('paymentNumber').textContent = rechargeData.operatorNumber;
-                document.getElementById('amount').textContent = rechargeData.amount;
-                document.getElementById('phone').textContent = rechargeData.phone;
-                document.getElementById('operator').textContent = rechargeData.operator.toUpperCase();
-            } else {
-                window.location.href = 'recharge.html';
+// Gestionnaire d'authentification
+const AuthManager = {
+    checkAuth() {
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                UI.showNotification('Veuillez vous connecter pour continuer', 'error');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
             }
-
-            // Vérifier l'authentification
-            onAuthStateChanged(auth, (user) => {
-                if (!user) {
-                    showNotification('Veuillez vous connecter pour continuer', 'error');
-                    setTimeout(() => {
-                        window.location.href = 'login.html';
-                    }, 2000);
-                }
-            });
         });
+    }
+};
 
-        // Gérer la soumission du formulaire
-        document.getElementById('confirmationForm').addEventListener('submit', async function(e) {
+// Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialisation des fonctions globales
+    window.copyToClipboard = ClipboardManager.copy;
+
+    // Chargement initial
+    DataManager.loadRechargeData();
+    AuthManager.checkAuth();
+
+    // Gestion du formulaire
+    const confirmationForm = document.getElementById('confirmationForm');
+    if (confirmationForm) {
+        confirmationForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const user = auth.currentUser;
             if (!user) {
-                showNotification('Veuillez vous connecter pour continuer', 'error');
+                UI.showNotification('Veuillez vous connecter pour continuer', 'error');
                 return;
             }
 
-            showLoading();
+            UI.showLoading();
             
             try {
-                // Récupérer les données du formulaire
-                const userPaymentNumber = document.getElementById('userPaymentNumber').value;
-                const transactionId = document.getElementById('transactionId').value;
+                const formData = {
+                    userPaymentNumber: document.getElementById('userPaymentNumber').value,
+                    transactionId: document.getElementById('transactionId').value
+                };
                 
-                // Récupérer les données de la recharge
                 const rechargeData = JSON.parse(sessionStorage.getItem('rechargeData'));
                 
-                // Créer l'objet de transaction
-                const transactionData = {
-                    ...rechargeData,
-                    userPaymentNumber: userPaymentNumber,
-                    transactionId: transactionId,
-                    status: 'pending',
-                    date: new Date().toISOString(),
-                    userId: user.uid,
-                    credited: false
-                };
+                await DataManager.saveTransaction(user, formData, rechargeData);
 
-                // Sauvegarder dans Firebase
-                const transactionsRef = ref(db, 'transactions');
-                const newTransactionRef = push(transactionsRef);
-                await set(newTransactionRef, transactionData);
-
-                showNotification('Paiement confirmé ! Redirection vers l\'historique...', 'success');
-                
-                // Nettoyer sessionStorage
+                UI.showNotification('Paiement confirmé ! Redirection vers l\'historique...', 'success');
                 sessionStorage.removeItem('rechargeData');
 
-                // Redirection après un court délai
                 setTimeout(() => {
                     window.location.href = 'historique.html';
                 }, 2000);
 
             } catch (error) {
                 console.error('Erreur lors de la confirmation:', error);
-                showNotification('Erreur lors de la confirmation: ' + error.message, 'error');
+                UI.showNotification('Erreur lors de la confirmation: ' + error.message, 'error');
             } finally {
-                hideLoading();
+                UI.hideLoading();
             }
         });
+    }
+});
     </script>
 </body>
 </html>
