@@ -277,9 +277,19 @@ h1:hover i {
     </div>
 
     <script type="module">
+        // Importations Firebase avec query et orderByChild
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-        import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+        import { 
+            getDatabase, 
+            ref, 
+            set, 
+            get, 
+            onValue,
+            query,
+            orderByChild,
+            update 
+        } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCPQvlxIjvJPkMZQ4qElkHla_xQ5QiZfFs",
@@ -350,7 +360,7 @@ h1:hover i {
             function translateStatus(status) {
                 const translations = {
                     success: 'Crédité',
-                    pending: 'En cour de verification',
+                    pending: 'En cours de vérification',
                     failed: 'Échec'
                 };
                 return translations[status] || status;
@@ -412,6 +422,7 @@ h1:hover i {
 
             function displayTransactions(transactions, userId) {
                 const historyList = document.getElementById('historyList');
+                if (!historyList) return;
                 
                 if (!transactions || Object.keys(transactions).length === 0) {
                     historyList.innerHTML = '<div class="no-records">Aucune transaction trouvée</div>';
@@ -458,23 +469,34 @@ h1:hover i {
                 });
             }
 
+            // Écouteur d'authentification
             onAuthStateChanged(auth, (user) => {
                 const historyList = document.getElementById('historyList');
+                if (!historyList) return;
                 
                 if (user) {
-                    const transactionsRef = query(ref(db, 'transactions'), orderByChild('date'));
+                    // Création de la requête avec query et orderByChild
+                    const transactionsRef = query(
+                        ref(db, 'transactions'),
+                        orderByChild('date')
+                    );
                     
+                    // Écoute des changements
                     onValue(transactionsRef, (snapshot) => {
                         try {
                             const transactions = snapshot.val();
                             displayTransactions(transactions, user.uid);
                         } catch (error) {
                             console.error('Erreur lors de la récupération des transactions:', error);
-                            historyList.innerHTML = '<div class="no-records">Erreur lors du chargement des transactions</div>';
+                            if (historyList) {
+                                historyList.innerHTML = '<div class="no-records">Erreur lors du chargement des transactions</div>';
+                            }
                         }
                     }, (error) => {
                         console.error('Erreur Firebase:', error);
-                        historyList.innerHTML = '<div class="no-records">Erreur de connexion</div>';
+                        if (historyList) {
+                            historyList.innerHTML = '<div class="no-records">Erreur de connexion</div>';
+                        }
                     });
                 } else {
                     historyList.innerHTML = '<div class="no-records">Veuillez vous connecter pour voir votre historique</div>';
@@ -483,9 +505,11 @@ h1:hover i {
 
         } catch (error) {
             console.error('Erreur d\'initialisation:', error);
-            document.getElementById('historyList').innerHTML = 
-                '<div class="no-records">Erreur d\'initialisation de l\'application</div>';
+            const historyList = document.getElementById('historyList');
+            if (historyList) {
+                historyList.innerHTML = '<div class="no-records">Erreur d\'initialisation de l\'application</div>';
+            }
         }
-    </script>
+</script>
 </body>
 </html>
