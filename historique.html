@@ -4,297 +4,488 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Historique des Recharges</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
     <style>
-        :root {
-            --primary-color: #0003fff5;
-            --secondary-color: #000000f5
-            --background-color: #000000f5;
-            --card-background: #000000f5;
-            --text-primary: #ff00dc;
-            --text-secondary: #0003ff;
-            --warning-color: #ff1f00;
-            --warning-bg: #000000;
-            --border-radius: 12px;
-        }
+    :root {
+    --primary-color: #6366f1;
+    --primary-light: #818cf8;
+    --success-color: #22c55e;
+    --warning-color: #eab308;
+    --error-color: #ef4444;
+    --bg-color: #f8fafc;
+    --card-bg: #ffffff;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --border-color: #e2e8f0;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        body {
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--background-color);
-            line-height: 1.6;
-            color: var(--text-primary);
-        }
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-color);
+    min-height: 100vh;
+    padding: 2rem;
+    font-size: 15px;
+    color: var(--text-primary);
+    line-height: 1.6;
+}
 
-        .app-container {
-            display: flex;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
-        }
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    padding: 2rem;
+    backdrop-filter: blur(8px);
+}
 
-        .sidebar {
-            width: 250px;
-            background-color: var(--card-background);
-            padding: 30px 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-        }
+h1 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 2rem;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    letter-spacing: -0.025em;
+}
 
-        .logo {
-            display: flex;
-            align-items: center;
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid var(--background-color);
-        }
+h1 i {
+    color: var(--primary-color);
+    transition: transform 0.3s ease;
+}
 
-        .logo img {
-            width: 50px;
-            margin-right: 15px;
-        }
+h1:hover i {
+    transform: rotate(15deg);
+}
 
-        .logo-text {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--primary-color);
-        }
+.history-item {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    transition: all 0.3s ease;
+}
 
-        .sidebar-menu {
-            list-style: none;
-        }
+.history-item:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-3px);
+    border-color: var(--primary-light);
+}
 
-        .sidebar-menu li {
-            margin-bottom: 15px;
-        }
+.history-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
 
-        .sidebar-menu a {
-            text-decoration: none;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            padding: 10px 15px;
-            border-radius: var(--border-radius);
-            transition: all 0.3s ease;
-        }
+.info-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
 
-        .sidebar-menu a:hover,
-        .sidebar-menu a.active {
-            background-color: rgba(0, 123, 255, 0.1);
-            color: var(--primary-color);
-        }
+.info-group:hover {
+    background-color: #f8fafc;
+}
 
-        .sidebar-menu a i {
-            margin-right: 15px;
-            font-size: 18px;
-        }
+.info-group i {
+    width: 18px;
+    color: var(--primary-color);
+    transition: transform 0.2s ease;
+}
 
-        .main-content {
-            flex-grow: 1;
-            padding: 40px;
-            background-color: transparent;
-            overflow-y: auto;
-        }
+.info-group:hover i {
+    transform: scale(1.1);
+}
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
+.info-label {
+    font-size: 0.813rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
 
-        .header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-        }
+.info-value {
+    font-weight: 600;
+    color: var(--text-primary);
+}
 
-        .header h1 i {
-            margin-right: 15px;
-            color: var(--primary-color);
-        }
+.status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.813rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: transform 0.2s ease;
+}
 
-        .search-bar {
-            display: flex;
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
+.status:hover {
+    transform: scale(1.05);
+}
 
-        .search-bar input {
-            flex-grow: 1;
-            border: none;
-            padding: 12px 15px;
-            border-radius: var(--border-radius);
-        }
+.status i {
+    font-size: 0.875rem;
+}
 
-        .search-bar button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0 20px;
-            border-radius: 0 var(--border-radius) var(--border-radius) 0;
-        }
+.status-success {
+    background: #dcfce7;
+    color: var(--success-color);
+}
 
-        .transactions-container {
-            background-color: var(--card-background);
-            border-radius: var(--border-radius);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
-            padding: 25px;
-        }
+.status-pending {
+    background: #fef9c3;
+    color: var(--warning-color);
+}
 
-        .transaction-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            border-bottom: 1px solid var(--background-color);
-            transition: background-color 0.3s ease;
-        }
+.status-failed {
+    background: #fee2e2;
+    color: var(--error-color);
+}
 
-        .transaction-item:last-child {
-            border-bottom: none;
-        }
+.operator-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    margin-bottom: 0.75rem;
+    transition: all 0.3s ease;
+}
 
-        .transaction-item:hover {
-            background-color: rgba(0, 123, 255, 0.03);
-        }
+.operator-logo:hover {
+    transform: rotate(360deg);
+    background: var(--primary-color);
+}
 
-        .transaction-details {
-            flex-grow: 1;
-        }
+.operator-logo:hover i {
+    color: white;
+}
 
-        .transaction-amount {
-            font-weight: 700;
-            color: var(--primary-color);
-        }
+.operator-logo i {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    transition: color 0.3s ease;
+}
 
-        .transaction-warning {
-            background-color: var(--warning-bg);
-            border-left: 4px solid var(--warning-color);
-            padding: 15px;
-            margin-top: 15px;
-            border-radius: 6px;
-        }
+.reject-reason {
+    grid-column: 1 / -1;
+    background: #fee2e2;
+    padding: 0.75rem;
+    border-radius: 8px;
+    color: var(--error-color);
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    animation: fadeIn 0.3s ease;
+}
 
-        .transaction-warning i {
-            color: var(--warning-color);
-            margin-right: 10px;
-        }
+.processing-info {
+    grid-column: 1 / -1;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: #f8fafc;
+    border-radius: 8px;
+}
 
-        .transaction-warning p {
-            color: var(--warning-color);
-            font-size: 0.9em;
-        }
+.no-records {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 2px dashed var(--border-color);
+    transition: all 0.3s ease;
+}
 
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-        }
+.no-records:hover {
+    border-color: var(--primary-light);
+    background: #f1f5f9;
+}
 
-        .btn {
-            padding: 10px 15px;
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
-        .btn-delete {
-            background-color: var(--warning-color);
-            color: white;
-        }
+@media (max-width: 768px) {
+    body {
+        padding: 1rem;
+    }
 
-        .btn-clear {
-            background-color: var(--secondary-color);
-            color: white;
-        }
+    .container {
+        padding: 1.25rem;
+        margin: 0;
+        border-radius: 12px;
+    }
 
-        @media (max-width: 768px) {
-            .app-container {
-                flex-direction: column;
-            }
-            .sidebar {
-                width: 100%;
-            }
-            .main-content {
-                padding: 20px;
-            }
-        }
+    .history-item {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+}
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <aside class="sidebar">
-            <div class="logo">
-                <img src="https://image.noelshack.com/fichiers/2024/50/4/1733962424-78449751-fb3b-4494-82cc-34a5ed1248ca4.jpeg" alt="Logo BNP">
-                <span class="logo-text">BNP PARIBAS HISTORIQUE DE RECHARGE</span>
-            </div>
-            
-        
-            <div class="transactions-container" id="rechargeHistoryContainer">
-                <!-- Les transactions seront chargées ici dynamiquement -->
-            </div>
-            <div class="action-buttons">
-                <button id="clearHistory" class="btn btn-clear">
-                    <i class="fas fa-trash"></i> Tout Supprimer
-                </button>
-            </div>
-        </main>
+    <div class="container">
+        <h1><i class="fas fa-history"></i> Historique des Recharges</h1>
+        <div id="historyList"></div>
     </div>
 
-    <script>
-        function loadRechargeHistory() {
-            const rechargeHistory = JSON.parse(localStorage.getItem('rechargeHistory')) || [];
-            const container = document.getElementById('rechargeHistoryContainer');
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+        import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
-            container.innerHTML = rechargeHistory.length === 0 
-                ? `<div class="transaction-item">
-                        <div class="transaction-details">
-                            <p>Aucune transaction récente</p>
-                        </div>
-                    </div>`
-                : rechargeHistory.map((record, index) => `
-                    <div class="transaction-item">
-                        <div class="transaction-details">
-                            <p class="transaction-amount">${record.amount} FCFA</p>
-                            <p>Mode de Paiement: ${record.paymentMethod}</p>
-                            <p>N° Paiement: ${record.paymentNumber}</p>
-                            <p>Date: ${record.date}</p>
-                            <div class="transaction-warning">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <p><p>Attention : Veuillez contacter l'administrateur pour vérification de votre paiement. En cas d'annulation de transfert, votre compte BNP PARIBAS sera banni.</p>
-                            </div>
-                        </div>
-                        <button class="btn btn-delete" onclick="deleteRecord(${index})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                `).join('');
-        }
+        const firebaseConfig = {
+            apiKey: "AIzaSyCPQvlxIjvJPkMZQ4qElkHla_xQ5QiZfFs",
+            authDomain: "paris-3df9f.firebaseapp.com",
+            databaseURL: "https://paris-3df9f-default-rtdb.firebaseio.com",
+            projectId: "paris-3df9f",
+            storageBucket: "paris-3df9f.appspot.com",
+            messagingSenderId: "365107415196",
+            appId: "1:365107415196:web:4c0021baec5a51a0f50559"
+        };
+ 
+        try {
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            const db = getDatabase(app);
+            const creditedTransactions = new Set();
 
-        function deleteRecord(index) {
-            const rechargeHistory = JSON.parse(localStorage.getItem('rechargeHistory')) || [];
-            rechargeHistory.splice(index, 1);
-            localStorage.setItem('rechargeHistory', JSON.stringify(rechargeHistory));
-            loadRechargeHistory();
-        }
+            async function updateUserBalance(userId, amount, transactionId) {
+                if (creditedTransactions.has(transactionId)) return;
 
-        function clearAllHistory() {
-            if (confirm('Voulez-vous vraiment supprimer tout l\'historique ?')) {
-                localStorage.removeItem('rechargeHistory');
-                loadRechargeHistory();
+                try {
+                    const userRef = ref(db, `users/${userId}`);
+                    const snapshot = await get(userRef);
+
+                    if (snapshot.exists()) {
+                        const userData = snapshot.val();
+                        const currentBalance = userData.solde || 0;
+                        const newBalance = currentBalance + parseFloat(amount);
+
+                        const updates = {};
+                        updates[`users/${userId}/solde`] = newBalance;
+                        updates[`transactions/${transactionId}/credited`] = true;
+
+                        await update(ref(db), updates);
+                        creditedTransactions.add(transactionId);
+                    }
+                } catch (error) {
+                    console.error('Erreur de mise à jour du solde:', error);
+                }
             }
-        }
 
-        document.getElementById('clearHistory').addEventListener('click', clearAllHistory);
-        loadRechargeHistory();
+            function formatDate(dateString) {
+                try {
+                    const date = new Date(dateString);
+                    if (isNaN(date.getTime())) throw new Error('Date invalide');
+                    
+                    return new Intl.DateTimeFormat('fr-FR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }).format(date).replace(',', ' à');
+                } catch (error) {
+                    return 'Date non disponible';
+                }
+            }
+
+            function getStatusClass(status) {
+                const statusClasses = {
+                    success: 'status-success',
+                    pending: 'status-pending',
+                    failed: 'status-failed'
+                };
+                return statusClasses[status] || '';
+            }
+
+            function translateStatus(status) {
+                const translations = {
+                    success: 'Crédité',
+                    pending: 'En cour de verification',
+                    failed: 'Échec'
+                };
+                return translations[status] || status;
+            }
+
+            function createHistoryItem(transaction, userId) {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.dataset.transactionId = transaction.transactionId || '';
+
+                if (transaction.status === 'success' && !transaction.credited && userId) {
+                    updateUserBalance(userId, transaction.amount || 0, transaction.transactionId);
+                }
+
+                historyItem.innerHTML = `
+                    <div class="history-info">
+                        <div class="info-group">
+                            <span class="info-label">Montant</span>
+                            <span class="info-value">${transaction.amount || 0} FCFA</span>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Numéro rechargé</span>
+                            <span class="info-value">${transaction.phone || 'Non spécifié'}</span>
+                        </div>
+                    </div>
+                    <div class="history-info">
+                        <div class="info-group">
+                            <span class="info-label">Opérateur</span>
+                            <span class="info-value">${transaction.operator ? transaction.operator.toUpperCase() : 'Non spécifié'}</span>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">ID Transaction</span>
+                            <span class="info-value">${transaction.transactionId || 'Non spécifié'}</span>
+                        </div>
+                    </div>
+                    <div class="history-info">
+                        <div class="info-group">
+                            <span class="info-label">Date</span>
+                            <span class="info-value">${formatDate(transaction.date)}</span>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">Numéro de paiement</span>
+                            <span class="info-value">${transaction.userPaymentNumber || 'Non spécifié'}</span>
+                        </div>
+                        ${transaction.processedDate ? `
+                            <div class="processing-info">Traité le ${formatDate(transaction.processedDate)}</div>
+                        ` : ''}
+                        ${transaction.status === 'failed' && transaction.rejectReason ? `
+                            <div class="reject-reason">Motif du rejet: ${transaction.rejectReason}</div>
+                        ` : ''}
+                        <div class="status ${getStatusClass(transaction.status || 'pending')}">
+                            ${translateStatus(transaction.status || 'pending')}
+                        </div>
+                    </div>
+                `;
+
+                return historyItem;
+            }
+
+            function displayTransactions(transactions, userId) {
+                const historyList = document.getElementById('historyList');
+                
+                if (!transactions || Object.keys(transactions).length === 0) {
+                    historyList.innerHTML = '<div class="no-records">Aucune transaction trouvée</div>';
+                    return;
+                }
+
+                const transactionsArray = Object.entries(transactions)
+                    .map(([id, transaction]) => ({...transaction, id}))
+                    .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+
+                const fragment = document.createDocumentFragment();
+                let hasNewItems = false;
+
+                transactionsArray.forEach(transaction => {
+                    const existingItem = document.querySelector(
+                        `[data-transaction-id="${transaction.transactionId}"]`
+                    );
+
+                    if (existingItem) {
+                        const newItem = createHistoryItem(transaction, userId);
+                        if (existingItem.innerHTML !== newItem.innerHTML) {
+                            existingItem.parentNode.replaceChild(newItem, existingItem);
+                        }
+                    } else {
+                        fragment.appendChild(createHistoryItem(transaction, userId));
+                        hasNewItems = true;
+                    }
+                });
+
+                if (hasNewItems) {
+                    if (historyList.children.length === 0) {
+                        historyList.appendChild(fragment);
+                    } else {
+                        historyList.insertBefore(fragment, historyList.firstChild);
+                    }
+                }
+
+                const currentIds = new Set(transactionsArray.map(t => t.transactionId));
+                Array.from(historyList.children).forEach(child => {
+                    const id = child.dataset.transactionId;
+                    if (id && !currentIds.has(id)) {
+                        child.remove();
+                    }
+                });
+            }
+
+            onAuthStateChanged(auth, (user) => {
+                const historyList = document.getElementById('historyList');
+                
+                if (user) {
+                    const transactionsRef = query(ref(db, 'transactions'), orderByChild('date'));
+                    
+                    onValue(transactionsRef, (snapshot) => {
+                        try {
+                            const transactions = snapshot.val();
+                            displayTransactions(transactions, user.uid);
+                        } catch (error) {
+                            console.error('Erreur lors de la récupération des transactions:', error);
+                            historyList.innerHTML = '<div class="no-records">Erreur lors du chargement des transactions</div>';
+                        }
+                    }, (error) => {
+                        console.error('Erreur Firebase:', error);
+                        historyList.innerHTML = '<div class="no-records">Erreur de connexion</div>';
+                    });
+                } else {
+                    historyList.innerHTML = '<div class="no-records">Veuillez vous connecter pour voir votre historique</div>';
+                }
+            });
+
+        } catch (error) {
+            console.error('Erreur d\'initialisation:', error);
+            document.getElementById('historyList').innerHTML = 
+                '<div class="no-records">Erreur d\'initialisation de l\'application</div>';
+        }
     </script>
 </body>
 </html>
