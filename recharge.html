@@ -316,8 +316,8 @@
             <div class="form-group">
                 <label for="amount">Montant</label>
                 <input type="number" id="amount" name="amount" min="1" 
-                       placeholder="Minimum 1 FCFA ou 1 USD TRON 20" required>
-                <span class="help-text">Montant minimum : 1 FCFA ou 1 USDT TRON 20</span>
+                       placeholder="Minimum 1500 FCFA ou 1 USD TRON 20" required>
+                <span class="help-text">Montant minimum : 1500 FCFA ou 1 USDT TRON 20</span>
             </div>
 
             <button type="submit">
@@ -419,8 +419,8 @@
                 isValid = false;
             }
 
-           if (amount < 100) {
-                showError('amountError', 'Le montant minimum est de 100 FCFA');
+           if (amount < 1500) {
+                showError('amountError', 'Le montant minimum est de 1500 FCFA');
                 isValid = false;
             }
 
@@ -504,7 +504,7 @@
         document.getElementById('amount').addEventListener('input', function(e) {
             const amount = parseInt(e.target.value);
             if (amount < 1) {
-                showError('amountError', 'Le montant minimum est de 1 FCFA');
+                showError('amountError', 'Le montant minimum est de 1500 FCFA');
             } else {
                 document.getElementById('amountError').style.display = 'none';
             }
